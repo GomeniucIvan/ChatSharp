@@ -1,10 +1,11 @@
 ﻿using ChatSharp.IO;
+using Microsoft.Extensions.FileProviders;
 
 namespace ChatSharp.Engine
 {
     public interface IApplicationContext
     {
         bool IsDatabaseInstalled { get; }
-        IFileSystem ContentRoot { get; }
+        IFileProvider ContentRoot { get; }
     }
 }

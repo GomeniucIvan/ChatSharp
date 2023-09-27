@@ -9,6 +9,7 @@ using ChatSharp.Core.Platform.Identity.Domain;
 using ChatSharp.Domain;
 using ChatSharp.Extensions;
 using ChatSharp.Web.Models.Install;
+using Microsoft.Extensions.FileProviders;
 
 namespace ChatSharp.Web.Controllers
 {

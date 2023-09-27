@@ -1,5 +1,5 @@
 ﻿using ChatSharp.Engine;
-using ChatSharp.IO;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 
 namespace ChatSharp.Core.Data
@@ -17,6 +17,6 @@ namespace ChatSharp.Core.Data
 
         public bool IsDatabaseInstalled => _dbContext.Database.CanConnect();
 
-        public IFileSystem ContentRoot => (IFileSystem)_env.ContentRootFileProvider;
+        public IFileProvider ContentRoot => _env.ContentRootFileProvider;
     }
 }

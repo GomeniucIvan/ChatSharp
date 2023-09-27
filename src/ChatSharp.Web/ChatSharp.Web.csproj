@@ -28,10 +28,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="App_Data\Installation\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\ChatSharp.Core\ChatSharp.Core.csproj" />
   </ItemGroup>
 
