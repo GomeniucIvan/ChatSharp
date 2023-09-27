@@ -231,3 +231,4 @@ _Pvt_Extensions
 # FAKE - F# Make
 .fake/
 /ChatSharp/connection.json
+/src/ChatSharp.Web/connection.json
