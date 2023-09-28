@@ -35,14 +35,6 @@ const Chat = () => {
 
             conversations.push(conversationMessage)
             setConversations(conversations);
-
-            conversationMessage = {
-                isMine: false,
-                message: message
-            };
-
-            conversations.push(conversationMessage)
-            setConversations(conversations);
         }
 
         setMessage('');
