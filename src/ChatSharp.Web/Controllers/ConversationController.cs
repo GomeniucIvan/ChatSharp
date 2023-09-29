@@ -32,7 +32,7 @@ namespace ChatSharp.Web.Controllers
         public async Task<IActionResult> SendMessage([FromBody] ConversationMessageModel model,
             CancellationToken cancelToken = default)
         {
-            var genericModel = new GenericResponse<bool>();
+            var genericModel = new GenericResponse<string>();
 
             if (model == null || string.IsNullOrEmpty(model.Message))
             {
@@ -44,15 +44,17 @@ namespace ChatSharp.Web.Controllers
                 EnteredMessage = model.Message,
             };
 
+            var resultMessage = "";
             var result = await _textToTextService.HandleTextRequestAsync(helper, async msg =>
             {
-                await _hubContext.Clients.All.SendAsync($"OnReceiveMessage_{helper.CustomerId}", new object[]
+                resultMessage += msg;
+                await _hubContext.Clients.All.SendAsync($"OnMessageReceive", new object[]
                 {
                     msg
                 }, cancellationToken: cancelToken);
             }, cancelToken);
 
-            return Ok(genericModel.Success(result));
+            return Ok(genericModel.Success(resultMessage));
         }
     }
 }

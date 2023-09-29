@@ -1,6 +1,10 @@
 ﻿using ChatSharp.Core.Data;
 using ChatSharp.Core.Messaging.TextToText.Llm.Settings;
 using ChatSharp.Core.Platform.Messaging.Dto;
+using LLama;
+using LLama.Common;
+using Microsoft.Extensions.DependencyInjection;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace ChatSharp.Core.Messaging.TextToText.Llm
 {
@@ -10,18 +14,21 @@ namespace ChatSharp.Core.Messaging.TextToText.Llm
 
         private readonly ChatSharpDbContext _dbContext;
         private readonly LlmSettings _settings;
+        private readonly IServiceProvider _services;
 
         public int Order => int.MinValue + 1;
+        LLamaWeights _model;
 
         #endregion
 
         #region Ctor
 
         public LocalLanguageModelTextService(ChatSharpDbContext dbContext,
-            LlmSettings settings)
+            LlmSettings settings, IServiceProvider services)
         {
             _dbContext = dbContext;
             _settings = settings;
+            _services = services;
         }
 
         #endregion
@@ -34,11 +41,20 @@ namespace ChatSharp.Core.Messaging.TextToText.Llm
         {
             if (_settings.EnableLlm)
             {
-                //foreach (var text in session.Chat(helper.EnteredMessage, new InferenceParams() { Temperature = 0.6f, AntiPrompts = new List<string> { "User:" } }))
-                //{
-                //    // Text response received
-                //    await onMessageReceived(text);
-                //}
+                var llama = _services.GetRequiredService<LlmModel>();
+                llama.LoadModel("C:\\Repositories\\llama-2-13b-chat.Q4_K_M.gguf");
+                var executor = llama.GetStatelessExecutor();
+
+                var inferenceParams = new InferenceParams()
+                {
+                    Temperature = 0.1f,
+                    MaxTokens = 64
+                };
+
+                foreach (var response in executor.Infer(helper.EnteredMessage, inferenceParams))
+                {
+                    await onMessageReceived(response);
+                }
 
                 return true;
             }
@@ -47,6 +63,5 @@ namespace ChatSharp.Core.Messaging.TextToText.Llm
         }
 
         #endregion
-
     }
 }

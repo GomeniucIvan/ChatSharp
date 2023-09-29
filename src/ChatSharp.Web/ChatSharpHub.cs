@@ -1,17 +1,9 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 
-namespace ChatSharp
+namespace ChatSharp.Web
 {
     public class ChatSharpHub : Hub
     {
-        public override async Task OnConnectedAsync()
-        {
-           
-        }
 
-        public override async Task OnDisconnectedAsync(Exception exception)
-        {
-           
-        }
     }
 }

@@ -11,6 +11,22 @@ const ChatMessaging = (props) => {
                     {conversation.message}
                 </span>
             ))}
+
+            {(props.incommingMessage || props.waitingResponse) &&
+                <span className={`messaging-wrapper-message bot-message ${(props.isGeneratingResponse ? 'glow-border' : '')}`}>
+                    <img className='ai-message-logo' src={Logo} />
+
+                    {props.waitingResponse &&
+                        <span className='loading-wrapper'>
+                            <span className="loading"></span>
+                            <span className="loading"></span>
+                            <span className="loading"></span>
+                        </span>
+                    }
+
+                    {props.incommingMessage}
+                </span>  
+            }
         </div>
     )
 }

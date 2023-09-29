@@ -2,9 +2,7 @@
 {
     public class MessageDtoHelper
     {
-        public int CustomerId { get; set; }
-        public int CharacterId { get; set; }
-        public int ConversationId { get; set; }
+        public int CustomerId { get; set; } = 1;
         public string EnteredMessage { get; set; }
     }
 }

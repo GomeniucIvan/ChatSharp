@@ -4,6 +4,7 @@ using ChatSharp;
 using ChatSharp.Core.Data;
 using ChatSharp.Core.Starter;
 using ChatSharp.Engine;
+using ChatSharp.Web;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);

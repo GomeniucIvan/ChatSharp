@@ -1,4 +1,5 @@
 ﻿using ChatSharp.Core.Data;
+using ChatSharp.Core.Messaging.TextToText.Llm.Settings;
 using ChatSharp.Core.Platform.Confirguration.Domain;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -8,6 +9,8 @@ namespace ChatSharp.Core.Starter
     {
         public static void ConfigureSettings(this IServiceCollection services)
         {
+            services.AddSingleton<LlmModel>();
+
             var settingsAssembly = typeof(ISettings).Assembly;
             var settingsTypes = settingsAssembly.GetTypes().Where(t => t.GetInterfaces().Contains(typeof(ISettings)));
 

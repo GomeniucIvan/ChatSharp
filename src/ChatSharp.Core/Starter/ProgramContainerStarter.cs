@@ -1,7 +1,9 @@
 ﻿using Autofac;
+using Autofac.Core;
 using ChatSharp.Core.Data;
 using ChatSharp.Core.Messaging.TextToText;
 using ChatSharp.Core.Messaging.TextToText.Llm;
+using ChatSharp.Core.Messaging.TextToText.Llm.Settings;
 using ChatSharp.Core.Platform.Configuration.Services;
 using ChatSharp.Engine;
 
