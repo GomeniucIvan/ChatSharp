@@ -1,14 +1,24 @@
-import Navbar from './components/NavBar';
+import LeftNavigation from './components/LeftNavigation';
 import AppRoutes from './AppRoutes';
 import { Route, Routes } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 
 import './assets/public.scss';
 
 const App = () => {
-    const styleMode = '';
+    const [themeMode, setThemeMode] = useState(localStorage.getItem('themeMode') || 'light-mode');
 
-    const handleNewConversation = () => {
+    useEffect(() => {
+        document.body.className = themeMode;
+        localStorage.setItem('themeMode', themeMode);
+    }, [themeMode]);
 
+    const toggleThemeMode = () => {
+        if (themeMode === 'light-mode') {
+            setThemeMode('dark-mode');
+        } else {
+            setThemeMode('light-mode');
+        }
     };
 
     const selectedConversation = () => {
@@ -16,14 +26,9 @@ const App = () => {
     };
 
     return (
-        <main
-            className={`main-wrapper ${styleMode}`}
-        >
+        <main className={`main-wrapper`}>
             <div className="left-nav">
-                <Navbar
-                    selectedConversation={selectedConversation}
-                    onNewConversation={handleNewConversation}
-                />
+                <LeftNavigation selectedConversation={selectedConversation} toggleThemeMode={toggleThemeMode} />
             </div>
 
             <div className="inner-wrapper">

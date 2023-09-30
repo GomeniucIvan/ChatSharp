@@ -1,0 +1,32 @@
+﻿@mixin grayButton {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 4px 6px;
+    text-decoration: none;
+    margin: 0;
+    color: var(--color-high);
+    text-align: center;
+
+    &:hover,
+    &:active {
+        background-color: var(--navbar-start);
+        box-shadow: 0px 1px 7px 0px rgba(0, 0, 0, 0.1);
+    }
+}
+
+@mixin submitButton {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 4px 6px;
+    text-decoration: none;
+    margin: 0;
+    background-color: #6096f1;
+    color: white;
+    text-align: center;
+
+    &:hover,
+    &:active {
+        background-color: #3d7ce6;
+        box-shadow: 0px 1px 7px 0px rgba(0, 0, 0, 0.1);
+    }
+}

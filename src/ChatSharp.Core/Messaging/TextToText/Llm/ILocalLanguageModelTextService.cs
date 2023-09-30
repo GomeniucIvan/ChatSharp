@@ -12,7 +12,6 @@ namespace ChatSharp.Core.Messaging.TextToText.Llm
     {
         #region Fields
 
-        private readonly ChatSharpDbContext _dbContext;
         private readonly LlmSettings _settings;
         private readonly IServiceProvider _services;
 
@@ -23,10 +22,9 @@ namespace ChatSharp.Core.Messaging.TextToText.Llm
 
         #region Ctor
 
-        public LocalLanguageModelTextService(ChatSharpDbContext dbContext,
-            LlmSettings settings, IServiceProvider services)
+        public LocalLanguageModelTextService(LlmSettings settings, 
+            IServiceProvider services)
         {
-            _dbContext = dbContext;
             _settings = settings;
             _services = services;
         }
@@ -39,10 +37,10 @@ namespace ChatSharp.Core.Messaging.TextToText.Llm
             Func<string, Task> onMessageReceived,
             CancellationToken cancellationToken)
         {
-            if (_settings.EnableLlm)
+            if (_settings.EnableLLM)
             {
                 var llama = _services.GetRequiredService<LlmModel>();
-                llama.LoadModel("C:\\Repositories\\llama-2-13b-chat.Q4_K_M.gguf");
+                llama.LoadModel(Path.Combine(_settings.ModelsPath, "llama-2-13b-chat.Q4_K_M.gguf"));
                 var executor = llama.GetStatelessExecutor();
 
                 var inferenceParams = new InferenceParams()

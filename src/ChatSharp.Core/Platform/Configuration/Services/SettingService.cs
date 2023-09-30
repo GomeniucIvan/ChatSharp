@@ -25,10 +25,11 @@ namespace ChatSharp.Core.Platform.Configuration.Services
                 var name = property.Name;
                 var value =  property.GetValue(settings)?.ToString();
 
-                var existingSetting = _setSettings.FirstOrDefault(s => s.Name == name);
+                var existingSetting = _dbContext.Settings.FirstOrDefault(s => s.Name == name);
                 if (existingSetting != null)
                 {
                     existingSetting.Value = value;
+                    _dbContext.Settings.Update(existingSetting);
                 }
                 else
                 {

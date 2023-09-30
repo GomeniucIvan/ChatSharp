@@ -17,7 +17,7 @@ const ChatDefault = (props) => {
                         ChatSharp
                     </h1>
 
-                    <span>Where Conversations Get Sharper</span>
+                    <span>Where conversations get sharper</span>
                 </div>
 
                 <div className='chat-default-models-wrapper'>

@@ -70,17 +70,17 @@ const Chat = () => {
         }
     };
 
-    const selectExample = async (selectedExampleMessage) => {
+    const selectExample = async (example) => {
         let conversationMessage = {
             isMine: true,
-            message: selectedExampleMessage
+            message: example
         };
 
         conversations.push(conversationMessage)
         setConversations(conversations);
 
         setIsDefaultPage(false);
-        await sendMessage(enteredMessage);
+        await sendMessage(example);
     }
 
     const sendMessage = async (enteredMessage) => {

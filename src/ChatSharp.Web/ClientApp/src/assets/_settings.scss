@@ -1,0 +1,62 @@
+﻿.settings-page {
+    display: flex;
+    align-items: center;
+    height: 100vh;
+
+    .settings-page-setting-block {
+        display: flex;
+        padding: 1.8rem 0px;
+        border-bottom: 1px solid var(--border-color);
+
+        .settings-block-name {
+            width: 40%;
+            font-weight: 700;
+        }
+
+        .settings-block-settings {
+            .settings-block-settings-setting {
+                display: flex;
+                gap: 4px;
+                flex-direction: column;
+
+                &.cb-setting {
+                    flex-direction: row;
+                    gap: 18px;
+                }
+
+                .label-description {
+                    opacity: 0.4;
+                }
+
+                .cb-block {
+                    display: flex;
+                    flex-direction: column;
+                }
+            }
+
+            .settings-block-settings-setting + .settings-block-settings-setting {
+                padding-top: 25px;
+            }
+        }
+    }
+
+    .settings-page-footer-buttons {
+        padding: 1.8rem 0px;
+        display: flex;
+        justify-content: flex-end;
+        gap: 16px;
+
+        a, button {
+            font-size: 16px;
+            padding: 6px 14px !important;
+        }
+
+        .btn-cancel {
+            @include grayButton;
+        }
+
+        .btn-submit {
+            @include submitButton;
+        }
+    }
+}

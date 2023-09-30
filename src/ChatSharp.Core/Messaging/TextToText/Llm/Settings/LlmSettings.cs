@@ -4,7 +4,7 @@ namespace ChatSharp.Core.Messaging.TextToText.Llm.Settings
 {
     public class LlmSettings : ISettings
     {
-        public bool EnableLlm { get; set; } = true;
-        public string ModelPath { get; set; } = "D:/Models";
+        public bool EnableLLM { get; set; } = true;
+        public string ModelsPath { get; set; } = "D:/Models";
     }
 }
