@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
 using System.Reflection;
 using ChatSharp.Engine;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace ChatSharp.Core.Data
@@ -142,6 +143,7 @@ namespace ChatSharp.Core.Data
                 return relationalDependencies;
             }
 
+            ConsoleExtensions.ErrorWriteLine(new InvalidOperationException(RelationalStrings.RelationalNotInUse));
             throw new InvalidOperationException(RelationalStrings.RelationalNotInUse);
         }
 
@@ -242,6 +244,61 @@ namespace ChatSharp.Core.Data
             }
 
             public Type PropertyType => _property.PropertyType;
+        }
+
+        #endregion
+
+        #region Helpers
+
+        public static SqlParameter ToSqlParameter<T>(this T value, string paramName)
+        {
+            var param = new SqlParameter(paramName, GetSqlDbType(typeof(T))) 
+            {
+                Value = value,
+            };
+
+            if (value == null)
+                param.SqlValue = DBNull.Value;
+
+            return param;
+        }
+
+        private static SqlDbType GetSqlDbType(Type type)
+        {
+            switch (Type.GetTypeCode(type))
+            {
+                case TypeCode.String:
+                    return SqlDbType.NVarChar;
+                case TypeCode.Int32:
+                    return SqlDbType.NVarChar; //todo fix
+                case TypeCode.Int64:
+                    return SqlDbType.NVarChar; //todo fix
+                case TypeCode.Byte:
+                    return SqlDbType.TinyInt;
+                case TypeCode.DateTime:
+                    return SqlDbType.DateTime;
+                case TypeCode.Boolean:
+                    return SqlDbType.Bit;
+                case TypeCode.Double:
+                    return SqlDbType.Float;
+                case TypeCode.Decimal:
+                    return SqlDbType.Decimal;
+                case TypeCode.Char:
+                    return SqlDbType.Char;
+            }
+
+            if (type == typeof(Guid))
+                return SqlDbType.UniqueIdentifier;
+
+            if (type == typeof(Guid?))
+                return SqlDbType.NVarChar;
+            if (type == typeof(DateTimeOffset))
+                return SqlDbType.DateTimeOffset;
+            if (type == typeof(TimeSpan))
+                return SqlDbType.Time;
+
+            ConsoleExtensions.ErrorWriteLine( new ArgumentException($"Unsupported type {type.FullName}"));
+            throw new ArgumentException($"Unsupported type {type.FullName}");
         }
 
         #endregion

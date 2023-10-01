@@ -91,8 +91,19 @@ input, textarea {
             }
         }
 
-        .left-nav-chats {
+        .left-nav-sessions {
             overflow: auto;
+            padding: 0px 10px;
+
+            ul {
+                padding-left: 0;
+
+                .left-nav-session {
+                    a {
+                        @include navLinkItem;
+                    }
+                }
+            }
         }
 
         .left-nav-footer {
@@ -102,16 +113,7 @@ input, textarea {
 
                 li {
                     a {
-                        padding: 0.7rem 0.5rem;
-                        display: block;
-                        color: var(--color-default);
-                        text-decoration: none;
-                        border-radius: 8px;
-
-                        &:hover,
-                        &:active {
-                            background-color: var(--item-bg-hover);
-                        }
+                        @include navLinkItem;
                     }
                 }
             }
@@ -133,7 +135,6 @@ input, textarea {
             .chat-wrapper-body {
                 display: flex;
                 flex-direction: column;
-                overflow: auto;
                 max-height: 100vh;
 
                 &.default-true {

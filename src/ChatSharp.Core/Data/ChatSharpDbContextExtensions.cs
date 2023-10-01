@@ -1,4 +1,6 @@
-﻿using System.Data.Common;
+﻿using System.Data;
+using System.Data.Common;
+using System.Diagnostics;
 using Microsoft.Data.SqlClient;
 
 namespace ChatSharp.Core.Data

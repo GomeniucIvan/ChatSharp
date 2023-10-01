@@ -1,7 +1,9 @@
 ﻿using ChatSharp.Core.Data;
 using ChatSharp.Core.Messaging.TextToText.Llm.Settings;
 using ChatSharp.Core.Platform.Messaging.Dto;
+using ChatSharp.Extensions;
 using LLama;
+using LLama.Abstractions;
 using LLama.Common;
 using Microsoft.Extensions.DependencyInjection;
 using static System.Net.Mime.MediaTypeNames;
@@ -16,7 +18,6 @@ namespace ChatSharp.Core.Messaging.TextToText.Llm
         private readonly IServiceProvider _services;
 
         public int Order => int.MinValue + 1;
-        LLamaWeights _model;
 
         #endregion
 
@@ -39,25 +40,38 @@ namespace ChatSharp.Core.Messaging.TextToText.Llm
         {
             if (_settings.EnableLLM)
             {
-                var llama = _services.GetRequiredService<LlmModel>();
-                llama.LoadModel(Path.Combine(_settings.ModelsPath, "llama-2-13b-chat.Q4_K_M.gguf"));
-                var executor = llama.GetStatelessExecutor();
+                helper.WorkingModel ??= _settings.DefaultModel;
 
-                var inferenceParams = new InferenceParams()
+                LlmModel llama = _services.GetRequiredService<LlmModel>();
+                ChatSession session = llama.CreateSession(Path.Combine(_settings.ModelsPath, helper.WorkingModel));
+
+                var inferenceParams = helper.InferenceParams ?? new InferenceParams()
                 {
-                    Temperature = 0.1f,
+                    Temperature = 0.8f,
                     MaxTokens = 64
                 };
 
-                foreach (var response in executor.Infer(helper.EnteredMessage, inferenceParams))
+                foreach (var response in session.Chat(helper.EnteredMessage, inferenceParams))
                 {
                     await onMessageReceived(response);
                 }
 
+                if (helper.SaveSession)
+                    llama.SaveSession(helper.ModelGuid);
+
                 return true;
             }
 
+            ConsoleExtensions.ErrorWriteLine(new Exception("Todo implement additional text to text"));
             throw new Exception("Todo implement additional text to text");
+        }
+
+        public async Task<ChatSession> LoadSessionAsync(SessionDto dbSession)
+        {
+            LlmModel llama = _services.GetRequiredService<LlmModel>();
+            ChatSession chatSession = llama.LoadSession(dbSession);
+
+            return chatSession;
         }
 
         #endregion

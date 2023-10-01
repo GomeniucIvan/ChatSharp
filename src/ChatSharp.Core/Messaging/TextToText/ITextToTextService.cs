@@ -1,4 +1,5 @@
 ﻿using ChatSharp.Core.Platform.Messaging.Dto;
+using LLama;
 
 namespace ChatSharp.Core.Messaging.TextToText
 {
@@ -9,5 +10,6 @@ namespace ChatSharp.Core.Messaging.TextToText
             CancellationToken cancellationToken);
 
         public int Order { get; }
+        public Task<ChatSession> LoadSessionAsync(SessionDto dbSession);
     }
 }

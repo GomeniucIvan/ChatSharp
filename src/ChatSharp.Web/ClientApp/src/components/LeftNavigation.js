@@ -1,7 +1,34 @@
 import Logo from '../assets/images/logo.png';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation, useMatch } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useSelector } from 'react-redux';
 
 const LeftNavigation = (props) => {
+    const match = useMatch('/:guid');
+    const location = useLocation();
+    const sessions = useSelector(state => state.sessions);
+
+    const setPageRoute = () => {
+        let pageTitle = 'ChatSharp';
+        if (match) {
+            const guid = match.params.guid;
+
+            const session = sessions.find(i => i.Guid === guid);
+            if (session) {
+                pageTitle = session.Name;
+            }
+        }
+        document.title = pageTitle;
+    }
+
+    useEffect(() => {
+        setPageRoute();
+    }, [sessions]);
+
+    useEffect(() => {
+        setPageRoute();
+    }, [location]);
+
     return (
         <>
             <div className="left-nav-header">
@@ -10,8 +37,16 @@ const LeftNavigation = (props) => {
                 <NavLink to='/'>New Chat</NavLink>
             </div>
 
-            <div className="left-nav-chats">
-
+            <div className="left-nav-sessions">
+                <ul>
+                    {sessions.map((session, index) => (
+                        <li key={index} className='left-nav-session'>
+                            <NavLink className={``} to={`/${session.Guid}`}>
+                                {session.Name}
+                            </NavLink>
+                        </li>
+                    ))}
+                </ul>
             </div>
 
             <div className='left-nav-footer'>

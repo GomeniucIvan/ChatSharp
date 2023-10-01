@@ -1,19 +1,33 @@
 import { useEffect, useRef, useState } from "react";
 import ChatDefault from "./Chat/ChatDefault";
 import ChatMessaging from "./Chat/ChatMessaging";
-import { post } from "../utils/HttpClient";
+import { get, post } from "../utils/HttpClient";
+import { generateUUID, isNullOrEmpty } from "../utils/Utils";
 import { HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
+import { useLocation, useParams, useNavigate, useMatch } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { addSession } from "./Utils/redux/sessionsSlice";
 
 const Chat = () => {
+    const { guid } = useParams();
     const [footerHeight, setFooterHeight] = useState(0);
-    const [isDefaultPage, setIsDefaultPage] = useState(true);
+    const [isDefaultPage, setIsDefaultPage] = useState(isNullOrEmpty(guid));
     const [conversations, setConversations] = useState([]);
     const [enteredMessage, setEnteredMessage] = useState('');
     const [incommingMessage, setIncommingMessage] = useState('');
     const [isGeneratingResponse, setIsGeneratingResponse] = useState(false);
     const [signalRConnection, setSignalRConnection] = useState(null);
     const [waitingResponse, setWaitingResponse] = useState(false);
+    const [workingGuid, setWorkingGuid] = useState(guid);
     const footerRef = useRef(null);
+    const location = useLocation();
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const match = useMatch('/:guid');
+
+    useEffect(() => {
+        setIsDefaultPage(isNullOrEmpty(guid));
+    }, [location]);
 
     useEffect(() => {
         if (footerRef.current) {
@@ -29,11 +43,18 @@ const Chat = () => {
         setSignalRConnection(connection);
 
         connection.on(`OnMessageReceive`, (message) => {
-            console.log(message);
-
             const incMsg = message;
             setWaitingResponse(false);
             setIncommingMessage(prevMessage => prevMessage + incMsg);
+        });
+
+        connection.on(`OnNewSessionCreate`, (data) => {
+            let newSession = {
+                Name: data[0],
+                Guid: data[1],
+            };
+            navigate(`/${data[1]}`);
+            dispatch(addSession(newSession));
         });
 
         connection.start().then(function () {
@@ -42,7 +63,37 @@ const Chat = () => {
             //handleDisconnect();
             return console.error(err.toString());
         });
+
+        if (!isNullOrEmpty(guid)) {
+            const PopulateComponent = async () => {
+                await loadSessionHistory(guid); 
+            }
+
+            PopulateComponent();
+        }
     }, []);
+
+    useEffect(() => {
+        loadSessionHistory();
+    }, [location]);
+
+    const loadSessionHistory = async (guidRouteParam) => {
+        if (isNullOrEmpty(guidRouteParam)) {
+
+            if (match) {
+                guidRouteParam = match.params.guid;
+            }
+        }
+
+        if (!isNullOrEmpty(guidRouteParam)) {
+            const sessionResponse = await get(`ConversationLoadSessionHistory?guid=${guidRouteParam}`);
+
+            if (sessionResponse.IsValid) {
+                console.log(sessionResponse)
+                setConversations(sessionResponse.Data);
+            }
+        }       
+    }
 
     const handleKeyDown = (event) => {
         if (event.keyCode === 13 && !event.shiftKey) {
@@ -61,8 +112,8 @@ const Chat = () => {
             setIsDefaultPage(false);
 
             let conversationMessage = {
-                isMine: true,
-                message: enteredMessageToSubmit
+                IsMine: true,
+                Message: enteredMessageToSubmit
             };
 
             setConversations(prevConversations => [...prevConversations, conversationMessage]);
@@ -72,8 +123,8 @@ const Chat = () => {
 
     const selectExample = async (example) => {
         let conversationMessage = {
-            isMine: true,
-            message: example
+            IsMine: true,
+            Message: example
         };
 
         conversations.push(conversationMessage)
@@ -86,16 +137,24 @@ const Chat = () => {
     const sendMessage = async (enteredMessage) => {
         setIsGeneratingResponse(true);
         setWaitingResponse(true);
+        let workingGuidToPass = workingGuid;
+
+        console.log(workingGuidToPass)
+        if (isNullOrEmpty(workingGuidToPass)) {
+            workingGuidToPass = generateUUID();
+            setWorkingGuid(workingGuidToPass);      
+        }
 
         const postModel = {
-            Message: enteredMessage
+            Message: enteredMessage,
+            ModelGuid: workingGuidToPass
         };
 
         var result = await post('ConversationSendMessage', postModel);
         if (result.IsValid) {
             let conversationMessage = {
-                isMine: false,
-                message: result.Data
+                IsMine: false,
+                Message: result.Data
             };
 
             setConversations(prevConversations => [...prevConversations, conversationMessage]);
@@ -106,8 +165,6 @@ const Chat = () => {
             setIsGeneratingResponse(false);
             setWaitingResponse(false);
             setIncommingMessage('');
-
-            //pNotifyError todo
         }
     }
 

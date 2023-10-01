@@ -8,6 +8,10 @@ const AppRoutes = [
         element: <Chat />
     },
     {
+        path: '/:guid',
+        element: <Chat />
+    },
+    {
         path: '/settings',
         element: <Settings />
     },

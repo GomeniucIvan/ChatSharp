@@ -4,11 +4,11 @@ const ChatMessaging = (props) => {
     return (
         <div className='messaging-wrapper'>
             {props.conversations.map((conversation, index) => (
-                <span key={index} className={`messaging-wrapper-message ${(conversation.isMine ? 'my-message' : 'bot-message')}`}>
-                    {!conversation.isMine &&
+                <span key={index} className={`messaging-wrapper-message ${(conversation.IsMine ? 'my-message' : 'bot-message')}`}>
+                    {!conversation.IsMine &&
                         <img className='ai-message-logo' src={Logo} />
                     }
-                    {conversation.message}
+                    {conversation.Message}
                 </span>
             ))}
 

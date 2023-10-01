@@ -1,5 +1,6 @@
-﻿using LLama;
-using LLama.Abstractions;
+﻿using ChatSharp.Core.Platform.Messaging.Dto;
+using ChatSharp.Extensions;
+using LLama;
 using LLama.Common;
 
 namespace ChatSharp.Core.Messaging.TextToText.Llm.Settings
@@ -7,41 +8,64 @@ namespace ChatSharp.Core.Messaging.TextToText.Llm.Settings
     public class LlmModel
     {
         private readonly LlmSettings _settings;
-        private LLamaWeights _model;
-        private ModelParams _params;
-
-        private ILLamaExecutor _statelessExecutor;
-
+        private ChatSession _session;
         public LlmModel(LlmSettings settings)
         {
             _settings = settings;
         }
 
-
-        public void LoadModel(string modelUrl)
+        public ChatSession CreateSession(string modelUrl)
         {
-            if (_model != null)
+            if (!File.Exists(modelUrl))
             {
-                return;
+                ConsoleExtensions.ErrorWriteLine(new Exception("Model file not found."));
+                throw new Exception("Model file not found.");
             }
 
-            _params = new ModelParams(modelUrl)
+            var modelParams = new ModelParams(modelUrl)
             {
-                ContextSize = 1024,
-                Seed = 1337,
-                GpuLayerCount = 5
+                ContextSize = 1024
             };
 
-            _model = LLamaWeights.LoadFromFile(_params);
+            var model = LLamaWeights.LoadFromFile(modelParams);
+            var context = model.CreateContext(modelParams);
+            var ex = new InteractiveExecutor(context);
+            _session = new ChatSession(ex);
+            return _session;
         }
 
-        public ILLamaExecutor GetStatelessExecutor()
+        public void SaveSession(Guid modelGuid)
         {
-            if (_statelessExecutor == null)
+            var folderPathToSave = Path.Combine(_settings.PathToSaveSessions, $"{modelGuid.ToString().ToLower()}");
+
+            if (!Directory.Exists(folderPathToSave))
             {
-                _statelessExecutor = new StatelessExecutor(_model, _params);
+                Directory.CreateDirectory(folderPathToSave);
             }
-            return _statelessExecutor;
+
+            _session.SaveSession(folderPathToSave);
+        }
+
+        public ChatSession LoadSession(SessionDto dbSession)
+        {
+            var sessionPathToLoad = Path.Combine(_settings.PathToSaveSessions, $"{dbSession.Guid.ToString().ToLower()}");
+
+            if (!Directory.Exists(sessionPathToLoad))
+            {
+                ConsoleExtensions.ErrorWriteLine(new Exception("Session not exists."));
+                throw new Exception("Session not exists.");
+            }
+
+            if (_session != null)
+            {
+                //_session.Executor.Context.Dispose();
+                _session = null;
+            }
+
+            _session = CreateSession(Path.Combine(_settings.ModelsPath, dbSession.ModelName));
+            _session.LoadSession(sessionPathToLoad);
+
+            return _session;
         }
     }
 }

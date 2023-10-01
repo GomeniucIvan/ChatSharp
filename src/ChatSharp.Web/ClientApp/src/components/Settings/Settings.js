@@ -10,6 +10,10 @@ const settingsSchema = Yup.object().shape({
     modelsPath: Yup.string().when("enableLLM", {
         is: true,
         then: () => Yup.string().required("Models path is required")
+    }),
+    pathToSaveSessions: Yup.string().when("enableLLM", {
+        is: true,
+        then: () => Yup.string().required("Models save path is required")
     })
 })
 
@@ -26,6 +30,7 @@ const Settings = () => {
                 formik.setValues({
                     modelsPath: settingsData.ModelsPath,
                     enableLLM: settingsData.EnableLLM,
+                    pathToSaveSessions: settingsData.PathToSaveSessions,
                 });
             }
 
@@ -38,17 +43,18 @@ const Settings = () => {
     const formik = useFormik({
         initialValues: {
             modelsPath: 'D:/LlmModels',
+            pathToSaveSessions: 'D:/Models/Sessions',
             enableLLM: true,
         },
         validationSchema: settingsSchema,
         onSubmit: async (values, { setSubmitting }) => {
-            console.log(values);
 
             try {
                 setSubmitting(true);
                 var postModel = {
                     ModelsPath: values.modelsPath,
-                    EnableLLM: values.enableLLM
+                    EnableLLM: values.enableLLM,
+                    PathToSaveSessions: values.pathToSaveSessions,
                 };
 
                 var result = await post('SettingsSave', postModel);
@@ -122,6 +128,29 @@ const Settings = () => {
 
                                 {formik.touched.modelsPath && formik.errors.modelsPath ? (
                                     <div className="error-message">{formik.errors.modelsPath}</div>
+                                ) : null}
+                            </div>
+
+                            <div className='settings-block-settings-setting input-setting'>
+                                <label>
+                                    Sessions save path
+                                </label>
+
+                                <input
+                                    {...formik.getFieldProps('pathToSaveSessions')}
+                                    className={clsx(
+                                        { 'is-invalid': formik.touched.pathToSaveSessions && formik.errors.pathToSaveSessions },
+                                        {
+                                            'is-valid': formik.touched.pathToSaveSessions && !formik.errors.pathToSaveSessions,
+                                        }
+                                    )}
+                                    type='text'
+                                    placeholder='Path to save ex: D:/Models/Sessions'
+                                    autoComplete='off'
+                                />
+
+                                {formik.touched.pathToSaveSessions && formik.errors.pathToSaveSessions ? (
+                                    <div className="error-message">{formik.errors.pathToSaveSessions}</div>
                                 ) : null}
                             </div>
                         </div>
