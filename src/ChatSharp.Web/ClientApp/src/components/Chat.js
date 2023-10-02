@@ -118,7 +118,7 @@ const Chat = () => {
 
         conversations.push(conversationMessage)
         setConversations(conversations);
-
+        setWorkingGuid(null);
         setIsDefaultPage(false);
         await sendMessage(example);
     }
@@ -137,8 +137,6 @@ const Chat = () => {
             Message: enteredMessage,
             ModelGuid: workingGuidToPass
         };
-
-        console.log(postModel)
 
         var result = await post('ConversationSendMessage', postModel);
         if (result.IsValid) {

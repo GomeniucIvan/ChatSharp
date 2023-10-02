@@ -1,9 +1,7 @@
-﻿using ChatSharp.Core.Data;
-using ChatSharp.Core.Messaging.TextToText.Llm.Settings;
+﻿using ChatSharp.Core.Messaging.TextToText.Llm.Settings;
 using ChatSharp.Core.Platform.Messaging.Dto;
 using ChatSharp.Extensions;
 using LLama;
-using LLama.Abstractions;
 using LLama.Common;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -50,8 +48,6 @@ namespace ChatSharp.Core.Messaging.TextToText.Llm
                     AntiPrompts = new List<string> { "User:" }
                 };
 
-                var enteredMessage = helper.EnteredMessage;
-
                 if (_session == null)
                 {
                     helper.WorkingModel ??= _settings.DefaultModel;
@@ -59,10 +55,17 @@ namespace ChatSharp.Core.Messaging.TextToText.Llm
                     _llmModel = _services.GetRequiredService<LlmModel>();
                     _session = _llmModel.CreateSession(Path.Combine(_settings.ModelsPath, helper.WorkingModel));
 
-                    //instructions, todo find a better way
-                    foreach (var response in _session.Chat(instructions, inferenceParams))
+                    if (helper.DbSession != null)
                     {
+                        _session = await LoadSessionAsync(helper.DbSession);
+                    }
+                    else
+                    {
+                        //instructions, todo find a better way
+                        foreach (var response in _session.Chat(instructions, inferenceParams))
+                        {
                         
+                        } 
                     }
                 }
 
@@ -75,12 +78,8 @@ namespace ChatSharp.Core.Messaging.TextToText.Llm
                 {
                     var folderPathToSave = Path.Combine(_settings.PathToSaveSessions, $"{helper.ModelGuid.ToString().ToLower()}");
 
-                    if (!Directory.Exists(folderPathToSave))
-                    {
-                        Directory.CreateDirectory(folderPathToSave);
-                    }
-
                     _session.SaveSession(folderPathToSave);
+                    _session.Executor.Context.Dispose();
                 }
 
                 return true;

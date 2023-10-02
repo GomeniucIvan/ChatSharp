@@ -24,7 +24,7 @@ const ChatMessaging = (props) => {
                         </span>
                     }
 
-                    {props.incommingMessage}
+                    <div dangerouslySetInnerHTML={{ __html: props.incommingMessage }} />
                 </span>  
             }
         </div>

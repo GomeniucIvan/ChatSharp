@@ -9,5 +9,6 @@ namespace ChatSharp.Core.Platform.Messaging.Dto
         public string WorkingModel { get; set; }
         public Guid ModelGuid { get; set; }
         public bool SaveSession { get; set; }
+        public SessionDto DbSession { get; set; }
     }
 }

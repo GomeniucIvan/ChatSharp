@@ -48,7 +48,6 @@ namespace ChatSharp.Core.Messaging.TextToText.Llm.Settings
 
             if (_session != null)
             {
-                //_session.Executor.Context.Dispose();
                 _session = null;
             }
 

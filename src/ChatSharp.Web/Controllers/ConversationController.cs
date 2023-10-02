@@ -60,16 +60,17 @@ namespace ChatSharp.Web.Controllers
                 return Ok(genericModel.Error("Invalid guid."));
             }
 
-            var helper = new MessageDtoHelper()
-            {
-                EnteredMessage = model.Message,
-                ModelGuid = guidValue
-            };
-
             var dbSession = _dbContext.Session_GetByFilter(new SessionDtoFilter()
             {
                 Guid = model.ModelGuid
             });
+
+            var helper = new MessageDtoHelper()
+            {
+                EnteredMessage = model.Message,
+                ModelGuid = guidValue,
+                DbSession = dbSession
+            };
 
             if (dbSession == null)
             {
