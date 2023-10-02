@@ -139,7 +139,6 @@ const Chat = () => {
         setWaitingResponse(true);
         let workingGuidToPass = workingGuid;
 
-        console.log(workingGuidToPass)
         if (isNullOrEmpty(workingGuidToPass)) {
             workingGuidToPass = generateUUID();
             setWorkingGuid(workingGuidToPass);      
@@ -149,6 +148,8 @@ const Chat = () => {
             Message: enteredMessage,
             ModelGuid: workingGuidToPass
         };
+
+        console.log(postModel)
 
         var result = await post('ConversationSendMessage', postModel);
         if (result.IsValid) {

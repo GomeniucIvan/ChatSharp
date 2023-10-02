@@ -6,7 +6,7 @@ const ChatDefault = (props) => {
     const examples = [
         "What is c#",
         "Assist in a task",
-        "Code a snake game",
+        "Code a snake game in c#",
     ]
 
     return (

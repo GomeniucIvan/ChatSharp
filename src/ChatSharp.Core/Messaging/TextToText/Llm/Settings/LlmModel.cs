@@ -24,26 +24,16 @@ namespace ChatSharp.Core.Messaging.TextToText.Llm.Settings
 
             var modelParams = new ModelParams(modelUrl)
             {
-                ContextSize = 1024
+                ContextSize = 1024,
+                Seed = 1337,
+                GpuLayerCount = 5
             };
 
             var model = LLamaWeights.LoadFromFile(modelParams);
             var context = model.CreateContext(modelParams);
             var ex = new InteractiveExecutor(context);
-            _session = new ChatSession(ex);
+            _session = new ChatSession(ex).WithOutputTransform(new LLamaTransforms.KeywordTextOutputStreamTransform(new string[] { "User:", "Bob:" }, redundancyLength: 8));
             return _session;
-        }
-
-        public void SaveSession(Guid modelGuid)
-        {
-            var folderPathToSave = Path.Combine(_settings.PathToSaveSessions, $"{modelGuid.ToString().ToLower()}");
-
-            if (!Directory.Exists(folderPathToSave))
-            {
-                Directory.CreateDirectory(folderPathToSave);
-            }
-
-            _session.SaveSession(folderPathToSave);
         }
 
         public ChatSession LoadSession(SessionDto dbSession)

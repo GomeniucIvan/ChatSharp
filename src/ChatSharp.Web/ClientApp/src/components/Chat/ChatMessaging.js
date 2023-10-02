@@ -8,7 +8,7 @@ const ChatMessaging = (props) => {
                     {!conversation.IsMine &&
                         <img className='ai-message-logo' src={Logo} />
                     }
-                    {conversation.Message}
+                    <div dangerouslySetInnerHTML={{ __html: conversation.Message }} />
                 </span>
             ))}
 

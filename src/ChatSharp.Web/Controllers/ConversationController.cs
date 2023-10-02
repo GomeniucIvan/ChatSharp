@@ -63,8 +63,7 @@ namespace ChatSharp.Web.Controllers
             var helper = new MessageDtoHelper()
             {
                 EnteredMessage = model.Message,
-                ModelGuid = guidValue,
-                SaveSession = true
+                ModelGuid = guidValue
             };
 
             var dbSession = _dbContext.Session_GetByFilter(new SessionDtoFilter()
@@ -77,11 +76,6 @@ namespace ChatSharp.Web.Controllers
                 var newSessionHelper = new MessageDtoHelper()
                 {
                     EnteredMessage = $"Provide one very short title for: {model.Message}, without additional text",
-                    InferenceParams = new InferenceParams()
-                    {
-                        Temperature = 0.4f,
-                        MaxTokens = 20
-                    }
                 };
 
                 var titleResultMessage = "";
@@ -103,6 +97,7 @@ namespace ChatSharp.Web.Controllers
             }
 
             var resultMessage = "";
+            helper.SaveSession = true;
             var result = await _textToTextService.HandleTextRequestAsync(helper, async msg =>
             {
                 resultMessage += msg;
