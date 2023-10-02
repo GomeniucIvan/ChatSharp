@@ -1,4 +1,5 @@
 import Logo from '../../assets/images/logo.png';
+import { formatMessageForHTML } from '../../utils/Utils';
 
 const ChatMessaging = (props) => {
     return (
@@ -8,7 +9,7 @@ const ChatMessaging = (props) => {
                     {!conversation.IsMine &&
                         <img className='ai-message-logo' src={Logo} />
                     }
-                    <div dangerouslySetInnerHTML={{ __html: conversation.Message }} />
+                    <div dangerouslySetInnerHTML={{ __html: formatMessageForHTML(conversation.Message) }} />
                 </span>
             ))}
 
@@ -24,7 +25,7 @@ const ChatMessaging = (props) => {
                         </span>
                     }
 
-                    <div dangerouslySetInnerHTML={{ __html: props.incommingMessage }} />
+                    <div dangerouslySetInnerHTML={{ __html: formatMessageForHTML(props.incommingMessage) }} />
                 </span>  
             }
         </div>

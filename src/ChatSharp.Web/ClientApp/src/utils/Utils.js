@@ -62,3 +62,7 @@ export function generateUUID() {
         return v.toString(16);
     });
 }
+
+export function formatMessageForHTML(message) {
+    return message.replace(/\n/g, '<br />');
+};

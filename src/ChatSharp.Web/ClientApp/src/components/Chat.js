@@ -16,7 +16,6 @@ const Chat = () => {
     const [enteredMessage, setEnteredMessage] = useState('');
     const [incommingMessage, setIncommingMessage] = useState('');
     const [isGeneratingResponse, setIsGeneratingResponse] = useState(false);
-    const [signalRConnection, setSignalRConnection] = useState(null);
     const [waitingResponse, setWaitingResponse] = useState(false);
     const [workingGuid, setWorkingGuid] = useState(guid);
     const footerRef = useRef(null);
@@ -38,10 +37,8 @@ const Chat = () => {
         const connection = new HubConnectionBuilder()
             .withUrl("/chatSharpHub")
             .withAutomaticReconnect()
-            .configureLogging(LogLevel.Trace)
+            .configureLogging(LogLevel.None)
             .build();
-
-        setSignalRConnection(connection);
 
         connection.on(`OnMessageReceive`, (message) => {
             const incMsg = message;
@@ -64,6 +61,10 @@ const Chat = () => {
             //handleDisconnect();
             return console.error(err.toString());
         });
+
+        return () => {
+            connection.stop();
+        };
     }, []);
 
     const loadSessionHistory = async (guidRouteParam) => {
@@ -78,7 +79,6 @@ const Chat = () => {
             const sessionResponse = await get(`ConversationLoadSessionHistory?guid=${guidRouteParam}`);
 
             if (sessionResponse.IsValid) {
-                console.log(sessionResponse)
                 setConversations(sessionResponse.Data);
             }
         }       
@@ -116,8 +116,7 @@ const Chat = () => {
             Message: example
         };
 
-        conversations.push(conversationMessage)
-        setConversations(conversations);
+        setConversations(prevConversations => [...prevConversations, conversationMessage]);
         setWorkingGuid(null);
         setIsDefaultPage(false);
         await sendMessage(example);

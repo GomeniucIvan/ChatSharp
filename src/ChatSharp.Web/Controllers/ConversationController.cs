@@ -84,9 +84,13 @@ namespace ChatSharp.Web.Controllers
                 var titleResult = await _textToTextService.HandleTextRequestAsync(newSessionHelper, async msg =>
                 {
                     titleResultMessage += msg;
-
-                    await _hubContext.Clients.All.SendAsync($"OnNewSessionCreate", msg, cancellationToken: cancelToken);
                 }, cancelToken);
+
+                await _hubContext.Clients.All.SendAsync($"OnNewSessionCreate", new List<string>()
+                {
+                    titleResultMessage,
+                    guidValue.ToString()
+                }, cancellationToken: cancelToken);
 
                 _dbContext.Session_Save(new Session()
                 {
