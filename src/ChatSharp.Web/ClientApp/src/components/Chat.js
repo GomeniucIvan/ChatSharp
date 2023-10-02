@@ -27,6 +27,7 @@ const Chat = () => {
 
     useEffect(() => {
         setIsDefaultPage(isNullOrEmpty(guid));
+        loadSessionHistory();
     }, [location]);
 
     useEffect(() => {
@@ -63,19 +64,7 @@ const Chat = () => {
             //handleDisconnect();
             return console.error(err.toString());
         });
-
-        if (!isNullOrEmpty(guid)) {
-            const PopulateComponent = async () => {
-                await loadSessionHistory(guid); 
-            }
-
-            PopulateComponent();
-        }
     }, []);
-
-    useEffect(() => {
-        loadSessionHistory();
-    }, [location]);
 
     const loadSessionHistory = async (guidRouteParam) => {
         if (isNullOrEmpty(guidRouteParam)) {
