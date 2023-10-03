@@ -11,6 +11,7 @@ BEGIN
 END
 GO
 
+
 CREATE PROCEDURE [dbo].[Session_GetList]
     (
     @Guid nvarchar(36) = NULL, 
@@ -29,7 +30,8 @@ BEGIN
 END
 GO
 
-ALTER PROCEDURE [dbo].[Session_Save]
+
+CREATE PROCEDURE [dbo].[Session_Insert]
      (
     @Guid uniqueidentifier,
 	@Name nvarchar(200), 
@@ -59,5 +61,48 @@ BEGIN
     END;
 
 	SELECT @sessionId;
+END
+GO
+
+
+CREATE PROCEDURE [dbo].[SessionMessage_Insert]
+    (@SessionId int,
+	 @IsMine bit,
+	 @Message nvarchar(MAX))
+AS
+BEGIN
+	DECLARE @sessionMessageId int;
+
+    IF ISNULL(@SessionId, 0) != 0
+    BEGIN
+        INSERT INTO dbo.SessionMessage
+        (   SessionId,
+            IsMine,
+            Message)
+        VALUES
+             (@SessionId,    -- SessionId - int
+              @IsMine, -- IsMine - bit
+              @Message  -- Message - nvarchar(max)
+            )
+
+        SET @sessionMessageId = SCOPE_IDENTITY();
+    END;
+
+	SELECT @sessionMessageId;
+END
+GO
+
+
+CREATE PROCEDURE [dbo].[SessionMessage_GetList]
+     (@SessionId int)
+AS
+BEGIN
+    SELECT  sm.Id AS Id, 
+			sm.IsMine AS IsMine, 
+			sm.Message AS Message
+
+    FROM     dbo.SessionMessage sm WITH(NOLOCK)
+    WHERE    sm.SessionId = @SessionId
+    ORDER BY sm.Id;
 END
 GO

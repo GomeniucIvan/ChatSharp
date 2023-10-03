@@ -1,5 +1,6 @@
 ﻿using ChatSharp.Core.Platform.Confirguration.Domain;
 using ChatSharp.Core.Platform.Identity.Domain;
+using ChatSharp.Core.Platform.Messaging.Domain;
 using Microsoft.EntityFrameworkCore;
 
 namespace ChatSharp.Core.Data
@@ -16,7 +17,7 @@ namespace ChatSharp.Core.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            
+            modelBuilder.ApplyConfiguration(new SessionMessageMap());
         }
     }
 }

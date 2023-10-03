@@ -1,8 +1,11 @@
-﻿using ChatSharp.Core.Messaging.TextToText.Llm.Settings;
+﻿using ChatSharp.Core.Data;
+using ChatSharp.Core.Messaging.TextToText.Llm.Settings;
 using ChatSharp.Core.Platform.Messaging.Dto;
+using ChatSharp.Core.Platform.Messaging.Proc;
 using ChatSharp.Extensions;
 using LLama;
 using LLama.Common;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace ChatSharp.Core.Messaging.TextToText.Llm
@@ -11,6 +14,7 @@ namespace ChatSharp.Core.Messaging.TextToText.Llm
     {
         #region Fields
 
+        private readonly ChatSharpDbContext _dbContext;
         private readonly LlmSettings _settings;
         private readonly IServiceProvider _services;
         private ChatSession _session;
@@ -25,9 +29,11 @@ namespace ChatSharp.Core.Messaging.TextToText.Llm
 
         #region Ctor
 
-        public LocalLanguageModelTextService(LlmSettings settings, 
+        public LocalLanguageModelTextService(ChatSharpDbContext dbContext,
+            LlmSettings settings, 
             IServiceProvider services)
         {
+            _dbContext = dbContext;
             _settings = settings;
             _services = services;
         }
@@ -79,7 +85,6 @@ namespace ChatSharp.Core.Messaging.TextToText.Llm
                     var folderPathToSave = Path.Combine(_settings.PathToSaveSessions, $"{helper.ModelGuid.ToString().ToLower()}");
 
                     _session.SaveSession(folderPathToSave);
-                    _session.Executor.Context.Dispose();
                 }
 
                 return true;

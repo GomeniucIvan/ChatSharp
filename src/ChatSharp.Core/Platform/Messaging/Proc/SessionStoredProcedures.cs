@@ -27,7 +27,7 @@ namespace ChatSharp.Core.Platform.Messaging.Proc
             return sessions.FirstOrDefault();
         }
 
-        public static int Session_Save(this ChatSharpDbContext db,
+        public static int Session_Insert(this ChatSharpDbContext db,
             Session session)
         {
             var guidParam = session.Guid.ToSqlParameter("Guid");
@@ -35,7 +35,7 @@ namespace ChatSharp.Core.Platform.Messaging.Proc
             var autoDeleteAfterXDaysParam = session.AutoDeleteAfterXDays.ToSqlParameter("AutoDeleteAfterXDays");
             var modelNameParam = session.ModelName.ToSqlParameter("ModelName");
 
-            var sessionId = db.ExecStoreProcedure<int>($"{nameof(Session)}_Save",
+            var sessionId = db.ExecStoreProcedure<int>($"{nameof(Session)}_Insert",
                 guidParam,
                 nameParam,
                 autoDeleteAfterXDaysParam,

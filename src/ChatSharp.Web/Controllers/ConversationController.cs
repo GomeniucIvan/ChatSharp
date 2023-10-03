@@ -92,7 +92,7 @@ namespace ChatSharp.Web.Controllers
                     guidValue.ToString()
                 }, cancellationToken: cancelToken);
 
-                _dbContext.Session_Save(new Session()
+                helper.CreatedSessionId = _dbContext.Session_Insert(new Session()
                 {
                     AutoDeleteAfterXDays = 0,
                     Guid = guidValue,
@@ -100,6 +100,13 @@ namespace ChatSharp.Web.Controllers
                     Name = titleResultMessage
                 });
             }
+
+            _dbContext.SessionMessage_Insert(new SessionMessageDto()
+            {
+                SessionId = helper.DbSession?.Id ?? helper.CreatedSessionId.GetValueOrDefault(),
+                IsMine = true,
+                Message = helper.EnteredMessage,
+            });
 
             var resultMessage = "";
             helper.SaveSession = true;
@@ -112,6 +119,13 @@ namespace ChatSharp.Web.Controllers
                 }, cancellationToken: cancelToken);
             }, cancelToken);
 
+            _dbContext.SessionMessage_Insert(new SessionMessageDto()
+            {
+                SessionId = helper.DbSession?.Id ?? helper.CreatedSessionId.GetValueOrDefault(),
+                IsMine = false,
+                Message = resultMessage,
+            });
+
             return Ok(genericModel.Success(resultMessage));
         }
 
@@ -120,7 +134,7 @@ namespace ChatSharp.Web.Controllers
         public async Task<IActionResult> LoadSessionHistory(string guid,
             CancellationToken cancelToken = default)
         {
-            var genericModel = new GenericResponse<IList<SessionMessageModel>>();
+            var genericModel = new GenericResponse<IList<SessionMessageDto>>();
             if (guid.IsEmpty())
             {
                 return Ok(genericModel.Error("Wrong guid."));
@@ -132,21 +146,21 @@ namespace ChatSharp.Web.Controllers
             });
 
             if (dbSession == null)
-            {
                 return Ok(genericModel.Error("Session not found."));
-            }
 
-            var chatSession = await _textToTextService.LoadSessionAsync(dbSession);
 
-            var sessionMessages = new List<SessionMessageModel>();
-            foreach(var message in chatSession.History.Messages)
-            {
-                sessionMessages.Add(new SessionMessageModel()
-                {
-                    IsMine = (message.AuthorRole == AuthorRole.User),
-                    Message = message.Content
-                });
-            }
+            IList<SessionMessageDto> sessionMessages = _dbContext.SessionMessage_GetList(sessionId: dbSession.Id);
+
+            //todo find a way to use chat session messages
+            //var chatSession = await _textToTextService.LoadSessionAsync(dbSession);
+            //foreach(var message in chatSession.History.Messages)
+            //{
+            //    sessionMessages.Add(new SessionMessageModel()
+            //    {
+            //        IsMine = (message.AuthorRole == AuthorRole.User),
+            //        Message = message.Content
+            //    });
+            //}
 
             return Ok(genericModel.Success(sessionMessages));
         }

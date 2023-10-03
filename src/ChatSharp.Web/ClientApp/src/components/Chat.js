@@ -70,8 +70,9 @@ const Chat = () => {
     }, []);
 
     const loadSessionHistory = async (guidRouteParam) => {
-        if (isNullOrEmpty(guidRouteParam)) {
+        setConversations([]);
 
+        if (isNullOrEmpty(guidRouteParam)) {
             if (match) {
                 guidRouteParam = match.params.guid;
             }
@@ -81,7 +82,10 @@ const Chat = () => {
             const sessionResponse = await get(`ConversationLoadSessionHistory?guid=${guidRouteParam}`);
             if (sessionResponse.IsValid) {
                 setConversations(sessionResponse.Data);
+                setWorkingGuid(guidRouteParam);
             }
+        } else {
+            setWorkingGuid(null);
         }       
     }
 
@@ -112,6 +116,7 @@ const Chat = () => {
     };
 
     const selectExample = async (example) => {
+
         let conversationMessage = {
             IsMine: true,
             Message: example
