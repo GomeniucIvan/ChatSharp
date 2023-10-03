@@ -18,6 +18,7 @@ const Chat = () => {
     const [isGeneratingResponse, setIsGeneratingResponse] = useState(false);
     const [waitingResponse, setWaitingResponse] = useState(false);
     const [workingGuid, setWorkingGuid] = useState(guid);
+    const [abortController, setAbortController] = useState(null);
     const footerRef = useRef(null);
     const location = useLocation();
     const dispatch = useDispatch();
@@ -27,6 +28,7 @@ const Chat = () => {
     useEffect(() => {
         setIsDefaultPage(isNullOrEmpty(guid));
         loadSessionHistory();
+        setIncommingMessage('');
     }, [location]);
 
     useEffect(() => {
@@ -77,7 +79,6 @@ const Chat = () => {
 
         if (!isNullOrEmpty(guidRouteParam)) {
             const sessionResponse = await get(`ConversationLoadSessionHistory?guid=${guidRouteParam}`);
-
             if (sessionResponse.IsValid) {
                 setConversations(sessionResponse.Data);
             }
@@ -137,23 +138,48 @@ const Chat = () => {
             ModelGuid: workingGuidToPass
         };
 
-        var result = await post('ConversationSendMessage', postModel);
-        if (result.IsValid) {
-            let conversationMessage = {
-                IsMine: false,
-                Message: result.Data
-            };
+        const cancellationController = new AbortController();
+        setAbortController(cancellationController);
 
-            setConversations(prevConversations => [...prevConversations, conversationMessage]);
-            setIsGeneratingResponse(false);
-            setWaitingResponse(false);
-            setIncommingMessage('');
-        } else {
-            setIsGeneratingResponse(false);
-            setWaitingResponse(false);
-            setIncommingMessage('');
+        try {
+            var result = await post('ConversationSendMessage', postModel, cancellationController.signal);
+
+            if (result.IsValid) {
+                let conversationMessage = {
+                    IsMine: false,
+                    Message: result.Data
+                };
+                setConversations(prevConversations => [...prevConversations, conversationMessage]);
+                setIsGeneratingResponse(false);
+                setWaitingResponse(false);
+                setIncommingMessage('');
+            } else {
+                setIsGeneratingResponse(false);
+                setWaitingResponse(false);
+                setIncommingMessage('');
+            }
+        } catch (error) {
+            if (error.name === 'AbortError') {
+                console.log("Request was cancelled");
+            }
+            // handle other potential errors here
         }
     }
+
+    const cancelRequestGeneration = () => {
+        if (abortController) {
+            abortController.abort();
+
+            setWaitingResponse(false);
+            let conversationMessage = {
+                IsMine: false,
+                Message: incommingMessage
+            };
+            setConversations(prevConversations => [...prevConversations, conversationMessage]);
+
+            setIncommingMessage('');
+        }
+    };
 
     return (
         <div className='chat-wrapper'>

@@ -64,5 +64,18 @@ export function generateUUID() {
 }
 
 export function formatMessageForHTML(message) {
-    return message.replace(/\n/g, '<br />');
+    if (isNullOrEmpty(message)) {
+        return '';
+    }
+
+    message = message.replace(/\n/g, '<br />');
+    while (message.startsWith('<br>') || message.startsWith('<br />')) {
+        message = message.replace(/^(<br>|<br \/>)/, '');
+    }
+
+    while (message.endsWith('<br>') || message.endsWith('<br />')) {
+        message = message.replace(/(<br>|<br \/>$)/, '');
+    }
+
+    return message;
 };
