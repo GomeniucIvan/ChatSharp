@@ -121,26 +121,53 @@ input, textarea {
     }
 
     .inner-wrapper {
-        max-width: 56rem;
         margin-left: auto;
         margin-right: auto;
         width: 100%;
         position: relative;
+        max-width: 56rem;
+
+        &.conversation-inner-wrapper {
+            max-width: initial;
+
+            .messaging-wrapper {
+                max-width: 56rem;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .chat-wrapper-footer {
+                margin-left: -8px;
+
+                form {
+                    max-width: 56rem;
+                    text-align: center;
+                    margin: auto;
+                }
+            }
+        }
 
         .chat-wrapper {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-
-            .chat-wrapper-body {
+            &.default-wrapper-true {
                 display: flex;
                 flex-direction: column;
-                max-height: 100vh;
+                height: 100%;
+            }
+
+            .chat-wrapper-body {
+                /*                display: flex;
+                flex-direction: column;
+                max-height: 100vh;*/
 
                 &.default-true {
                     gap: 2rem;
                     margin-top: auto;
                     margin-bottom: auto;
+                }
+
+                &.default-false {
+                    max-height: 100vh;
+                    overflow: auto;
                 }
 
                 .chat-default-wrapper {
@@ -231,7 +258,6 @@ input, textarea {
                         border-radius: 8px;
                         border: 1px solid var(--border-color);
                         background-color: var(--secondary-color);
-                        width: 100%;
                         position: relative;
 
                         &.glow-border {
@@ -295,6 +321,9 @@ input, textarea {
                 bottom: 0px;
                 width: 100%;
 
+                form {
+                    display: flex;
+                }
 
                 textarea {
                     padding: 0.75rem;

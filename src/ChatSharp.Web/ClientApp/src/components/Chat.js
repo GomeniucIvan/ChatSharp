@@ -24,11 +24,12 @@ const Chat = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const match = useMatch('/:guid');
+    const chatWrapperRef = useRef(null);
 
     useEffect(() => {
         setIsDefaultPage(isNullOrEmpty(guid));
         loadSessionHistory();
-        setIncommingMessage('');
+        setIncommingMessage('');      
     }, [location]);
 
     useEffect(() => {
@@ -83,6 +84,12 @@ const Chat = () => {
             if (sessionResponse.IsValid) {
                 setConversations(sessionResponse.Data);
                 setWorkingGuid(guidRouteParam);
+
+                setTimeout(function () {
+                    if (chatWrapperRef.current) {
+                        chatWrapperRef.current.scrollTop = chatWrapperRef.current.scrollHeight;
+                    }
+                }, 100)
             }
         } else {
             setWorkingGuid(null);
@@ -116,7 +123,6 @@ const Chat = () => {
     };
 
     const selectExample = async (example) => {
-
         let conversationMessage = {
             IsMine: true,
             Message: example
@@ -187,17 +193,17 @@ const Chat = () => {
     };
 
     return (
-        <div className='chat-wrapper'>
-            <div className={`chat-wrapper-body default-${(isDefaultPage ? 'true' : 'false')}`}>
+        <div className={`chat-wrapper default-wrapper-${(isDefaultPage ? 'true' : 'false')}`}>
+            <div className={`chat-wrapper-body default-${(isDefaultPage ? 'true' : 'false')}`} ref={chatWrapperRef}>
                 {isDefaultPage &&
                     <ChatDefault selectExample={selectExample} />
                 }
 
                 {!isDefaultPage &&
                     <ChatMessaging conversations={conversations}
-                                   isGeneratingResponse={isGeneratingResponse}
-                                   waitingResponse={waitingResponse}
-                                   incommingMessage={incommingMessage} />
+                        isGeneratingResponse={isGeneratingResponse}
+                        waitingResponse={waitingResponse}
+                        incommingMessage={incommingMessage} />
                 }
 
                 <div className='chat-wrapper-footer-fake' style={{ height: `${footerHeight}px` }}>
